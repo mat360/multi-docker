@@ -6,17 +6,17 @@ services:
 
 # Build du projet client en vue des tests
 before_install:
-  - docker build -t mat/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t mat360/react-test -f ./client/Dockerfile.dev ./client
 
 # Exécution des tests du projet client avec une fin d'exécution (option -e CI=true)
 script:
-  - docker run -e CI=true mat/react-test npm test
+  - docker run -e CI=true mat360/react-test npm test
 
 # Création des images Docker de production
 # Utilisation par défaut du fichier Dockerfile donc pas besoin du flag -f
 # Mais on précise toujours bien le contexte d'exécution (./client, ./nginx, ./server, ./worker)
 after_success:
-  - docker build -t mat/multi-client ./client
-  - docker build -t mat/multi-nginx ./nginx
-  - docker build -t mat/multi-server ./server
-  - docker build -t mat/multi-worker ./worker
+  - docker build -t mat360/multi-client ./client
+  - docker build -t mat360/multi-nginx ./nginx
+  - docker build -t mat360/multi-server ./server
+  - docker build -t mat360/multi-worker ./worker
