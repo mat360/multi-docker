@@ -12,11 +12,23 @@ before_install:
 script:
   - docker run -e CI=true mat360/react-test npm test
 
-# Création des images Docker de production
-# Utilisation par défaut du fichier Dockerfile donc pas besoin du flag -f
-# Mais on précise toujours bien le contexte d'exécution (./client, ./nginx, ./server, ./worker)
+# Si l'exécution des tests est OK (exit code 0)
 after_success:
+  # Création des images Docker de production
+  # Utilisation par défaut du fichier Dockerfile donc pas besoin du flag -f
+  # Mais on précise toujours bien le contexte d'exécution (./client, ./nginx, ./server, ./worker)
   - docker build -t mat360/multi-client ./client
   - docker build -t mat360/multi-nginx ./nginx
   - docker build -t mat360/multi-server ./server
   - docker build -t mat360/multi-worker ./worker
+
+  # Login to the docker CLI sur Travis en utilisant les paramètres DOCKER_PASSWORD et DOCKER_ID
+  # sauvés au niveau du projet dans Travis afin de ne pas les laisser en clair dans un projet publique
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # Pousser les images vers DockerHub
+  - docker push mat360/multi-client
+  - docker push mat360/multi-nginx
+  - docker push mat360/multi-server
+  - docker push mat360/multi-worker
+
