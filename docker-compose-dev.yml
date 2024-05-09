@@ -1,0 +1,57 @@
+version: '3'
+services:
+  # BdD 
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  # Cache
+  redis:
+    image: 'redis:latest'
+  # Serveur Web
+  nginx:
+    restart: always
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      # Le port externe 3050 sera mappé à l'intérieur du conteneur vers le port 80
+      - '3050:80'
+  # API Express Server
+  api:
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      # Le répertoire du conteneur /app/node_modules ne sera pas modiifié par le local
+      - /app/node_modules
+      # Le répertoire local /server est mappé avec le répertoire /app du conteneur
+      - ./server:/app
+    # Variables d'environnement Redis et Postgresql attendues par le server d'api Express
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  # Client React
+  client:
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  # Worker faisant les calculs de Fibonacci et écrivant dans Redis
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379

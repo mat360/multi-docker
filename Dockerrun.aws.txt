@@ -1,0 +1,18 @@
+Commentaires sur le fichier Dockerrun.aws.json
+=> Ce fichier était l'ancienne manière de déployer des multi-conteneurs sur ElasticBeanStalk
+=> Mais la nouvelle manière est d'utiliser un docker-compose
+=> C'est pourquoi on a dupliqué l'ancien docker-compose dans une version de dev
+=> et que l'on a créé un docker-compose de prod 
+
+Définition des containers à exécuter par AWS ElasticBeanStalk
+Basé sur les task definitions de AWS ECS
+A considéré un peu comme le docker-compose mais définition pour des containers et pas des images
+=> il n'y a pas de section "build"
+
+Liste de containers. Au moins un des containers doit être "essential" => si le conteneur crashe, 
+les autres sont stoppés
+Le "hostname" est le hostname de l'url utilisé par les autres conteneurs pour appeler les services 
+du présent conteneur
+portMappings => mappe le port externe du container au port interne
+links => permet la connexion entre conteneurs. Le présent conteneur peut se connecter 
+à la liste 'links' des conteneurs 
